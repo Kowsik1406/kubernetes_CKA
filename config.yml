@@ -1,0 +1,11 @@
+# three node (two workers) cluster config
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  extraPortMappings:
+  - containerPort: 30001
+    hostPort: 30001
+    #kind cluster does not expose nodePort services to the host by default, so we need to map the port to the host
+- role: worker
+- role: worker

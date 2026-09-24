@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: ReplicaSet 
+metadata:
+  name: nginx-rs
+  labels:
+    env: demo
+    type: frontend
+spec: 
+  replicas: 3 
+  template: 
+    metadata:
+      labels:
+        env: demo 
+        type: frontend 
+    spec:
+      containers: 
+      - name: nginx-container 
+        image: nginx 
+        ports: 
+        - containerPort: 80
+  selector:                #The selector is used because it will match the labels of the pod template using matchlabels and that pod will manage by replicaset. eg: pod which has env as demo
+    matchLabels:
+      env: demo
+      type: frontend 
+
+
+# try to scale up & down manually after creating pods 
+#(kubectl scale --replicas=5 rs/nginx-rs )
+# (kubectl scale --replicas=3 rs/nginx-rs )

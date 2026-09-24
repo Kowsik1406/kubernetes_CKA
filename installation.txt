@@ -1,0 +1,28 @@
+Install kind in powershell or windows using 
+[ choco install kind or winget install Kubernetes.kind ]
+
+Install kubectl to execute kubernetes commands. 
+
+Create cluster for control node using required image or leave it ( will create latest image ) and enter cluster name.
+[ kind create cluster --image kindest/node:v1.35.8@sha256:07b2536e30b803ed61d1677a79df6115f798ce64c80f9e22f6ed45afd09323c0 --name cka-cluster1 ]
+
+We required control node & n no.of wokernode ( above command will create only control node & to create multi-node cluster refer config.yml)
+kind create cluster --image kindest/node:v1.35.8@sha256:07b2536e30b803ed61d1677a79df6115f798ce64c80f9e22f6ed45afd09323c0 --name cka-cluster2 --config config.yml
+
+Verify using kubectl get nodes.
+
+now cka-cluster1 will be not there. TO check which context you're using( kubectl config get-contexts)
+
+TO switch back to required cluster or context ( kubectl config use-context kind-cka-cluster1 )
+my first cluster name = kind-cka-cluster1 
+
+If you check now (kubbectl get nodes so 1 node only will run)
+
+
+------------------------------------------
+
+kubectl get pods ( get the status of pod)
+kubectl describe pod pod_name
+kubectl edit pod pod_name
+
+kubectl exec -it pod_name --sh ( to get inside the container and check pwd, ls -lrt or any log files)

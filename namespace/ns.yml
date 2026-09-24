@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo
+
+
+
+
+#kubectl create namespace demo --> imperative way to create namespace
+#kubectl create deployment nginx --image=nginx -n demo --> imperative way to create deployment in demo namespace
+#kubectl expose deployment nginx --port=80 --type=NodePort -n demo --> imperative way to create service in demo namespace
+#kubectl exec -it nginx-deploy-65bbc9f5fb-trrjw -n demo -- sh ( to get into the pod )
+
+#create another namespace called test and create a pod in that namespace and try to access the pod from demo namespace using curl command. You will get an error because the pod is in different namespace. You can use --namespace flag to access the pod in different namespace.  
+
+#kubectl create namespace test
+#kubectl create deployment nginx --image=nginx -n test
+#kubectl get pods -n test
+#kubectl get pods -o wide -n test
+
+
+#get the ip's using kubectl get pods -o wide -n <namespacename> of both namespaces
+#kubectl exec -it <podname of any one ns> -n demo -- sh 
+#curl the ip of another namespace.
+
+#ip address is not static so we need to expose it in service and use the service name to access the pod in another namespace.
+
+#kubectl expose deployment nginx-deploy --name=svc-demo  --port=80 -n demo
+#kubectl expose deployment nginx-deploy --name=svc-test  --port=80 -n test
+
+#now check whether the service is accessible from another namespace using curl command.
+
+#kubectl get pods -n demo ( take anyone pod name  )
+#kubectl exec -it <podname> -n demo -- sh
+#if you give curl svc-test in this demo namespace pod you will get error.
+#cat /etc/resolv.conf ( check the search domain in this file, you will see only demo namespace is there, so it will not resolve the service name of another namespace )
+
+#now go to test namespace pod and check the /etc/resolv.conf file, you will see only test namespace is there, so it will not resolve the service name of another namespace.
+
+# in any of the pod execute the 
+#kubectl get svc -n demo and kubectl get svc -n test to get the service name and use that name to access the service from another namespace using curl command.
+
+#example
+#kubectl exec -it nginx-deploy-65bbc9f5fb-4stll -n test -- sh
+# in test namespace pod execute the below command to access the service in demo namespace
+#curl svc-demo.demo.svc.cluster.local ( this will work because we are using the service
+
+
+#to scale kubectl scale --replicas=3 deployment nginx-deploy -n demo & kubectl scale --replicas=3 deployment nginx-deploy -n test
+#kubectl expose deployment nginx-deploy --name=svc-demo --port=80 -n demo 
+#kubectl get svc -n demo
+
+
+#same for test namespace ( repeat the above command for test namespace ). 

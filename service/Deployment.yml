@@ -1,0 +1,28 @@
+#This deployment is created to expose the application using service.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    tier: backend
+spec:
+  replicas: 3
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        app: v1
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.23.0
+        ports:
+        - containerPort: 80
+  selector:
+    matchLabels:
+      app: v1
+
+
+#imperative way to create nginx deployment
+#kubectl create deployment nginx --image=nginx
+#kubectl expose deployment nginx --port=80 --type=NodePort

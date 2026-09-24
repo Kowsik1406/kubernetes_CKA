@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    env: demo
+    type: frontend
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx
+    ports:
+    - containerPort: 80
+
+
+#try kubectl apply -f rc.yml
+#kubectl get pods
+#kubectl delete pod <one.of.the pod name> 
+#kubectl get pods ( deleted pod will automatically replace by new )
