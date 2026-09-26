@@ -1,0 +1,1 @@
+A pod can have multiple containers sharing the same network namespace and storage volumes.

@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: multicontainerpod
+  labels:
+    app: myapp
+spec:
+  containers:
+  - name: myapp-container 
+    image: busybox:1.28
+    command: ['sh', '-c', 'echo the app is running! && sleep 3600']
+
+  initContainers:
+  - name: init-myservice 
+    image: busybox:1.28 
+    command: ['sh', '-c', "until nslookup myservice.default.svc.cluster.local; do echo waiting for myservice; sleep 10; done;"]
+    
+
+#kubectl apply -f mcpexample2.yml
+#kubectl get pods multicontainerpod
+#kubectl describe pod multicontainerpod
+#kubectl logs multicontainerpod -c myapp-container ( it will wait for the init container to complete before starting the main container, and then it will print "the app is running!" to the logs.  )
+#kubectl logs multicontainerpod -c init-myservice ( it will not print anything as there is no service named myservice in the default namespace, so it will keep waiting and printing "waiting for myservice" to the logs.   )
+#we need to create a service named myservice in the default namespace to complete the init container and start the main container.
+
+#NOTE: The init container will run first and complete its task before the main container (myapp-container) starts. In this case, it will wait for the service named myservice to be available before allowing the main container to run. If the service is not available, the init container will keep retrying and printing "waiting for myservice" to the logs until it succeeds.
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: myservice
+  labels:
+    app: myapp
+spec:
+   selector:
+     app: myapp
+
+   ports:
+   -  port: 80
+      targetPort: 80

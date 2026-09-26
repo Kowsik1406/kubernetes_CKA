@@ -8,7 +8,6 @@ metadata:
 
 #kubectl create namespace demo --> imperative way to create namespace
 #kubectl create deployment nginx --image=nginx -n demo --> imperative way to create deployment in demo namespace
-#kubectl expose deployment nginx --port=80 --type=NodePort -n demo --> imperative way to create service in demo namespace
 #kubectl exec -it nginx-deploy-65bbc9f5fb-trrjw -n demo -- sh ( to get into the pod )
 
 #create another namespace called test and create a pod in that namespace and try to access the pod from demo namespace using curl command. You will get an error because the pod is in different namespace. You can use --namespace flag to access the pod in different namespace.  
@@ -52,3 +51,7 @@ metadata:
 
 
 #same for test namespace ( repeat the above command for test namespace ). 
+
+
+# to delete service kubectl delete svc svc-demo -n demo 
+# to delete deployment kubectl delete deployment nginx-deploy -n demo
