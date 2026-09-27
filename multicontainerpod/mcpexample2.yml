@@ -24,6 +24,11 @@ spec:
 #we need to create a service named myservice in the default namespace to complete the init container and start the main container.
 
 #NOTE: The init container will run first and complete its task before the main container (myapp-container) starts. In this case, it will wait for the service named myservice to be available before allowing the main container to run. If the service is not available, the init container will keep retrying and printing "waiting for myservice" to the logs until it succeeds.
+
+
+
+# here we are creating service directly but before that create as deployment so if pod deleted the service is useless
+
 ---
 
 apiVersion: v1
@@ -39,3 +44,6 @@ spec:
    ports:
    -  port: 80
       targetPort: 80
+
+
+#Try imperative way -> kubectl expose pod multicontainerpod --name myservice --port 80

@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+  labels:
+    app.kubernetes.io/name: MyApp
+spec:
+  containers:
+  - name: myapp-container
+    image: busybox:1.28
+    env:
+    - name: FIRSTNAME
+      value: "KOWSIk"
+    command: ['sh', '-c', 'echo The app is running! && echo $FIRSTNAME && sleep 3600']
+
+  initContainers:
+  - name: init-myservice
+    image: busybox:1.28
+    command: ['sh', '-c'] #command to run
+    args: ['until nslookup myservice1.default.svc.cluster.local; do echo waiting for myservice; sleep 2; done']
+
+  - name: init-mydb
+    image: busybox:1.28
+    command: ['sh', '-c']
+    args: ['until nslookup mydb.default.svc.cluster.local; do echo waiting for mydb; sleep 2; done']
+
+# we can give command & arguments in same line as command or we can give command in one line and arguments in another line as shown above.
+
+#we are using two init containers in this example. The first init container will wait for the service named myservice to be available before allowing the main container to run.
+#The second init container will wait for the service named myservice2 to be available before allowing the main container to run.
+
+
+#kubectl apply -f mcpexample3.yml
+#kubectl describe pod myapp-pod
+# in describe command check for status of pod ( pending or running or succeeded or failed or CrashLoopBackOff)
+# check the state in init container ( like waiting and the reason- pod initializing in our output for now)
+# check ready status ( eg: ready - false so, pod can't serve traffic)
+# Always scroll to bottom & check for events ( if pod scheduled, image pulled & container created and started then it's fine with kubernetes)
+# The problem may be with init-container logic
+
+#So, kubectl logs myapp-pod -c init_container_name
+# So it's waiting for service ( create service in imperative way )
+
+#  kubectl expose pod myapp-pod --name myservice1 --port 80
+#kubectl describe pod myapp-pod   
+#kubectl logs myapp-pod -c init-myservice   ( now 1 init service will run )
+
+# kubectl expose pod myapp-pod --name mydb --port 80
+#now get pods and check logs for both containers  
+#kubectl logs myapp-pod -c init-mydb
+
+#better first create deployment for this example it's not required 
+#kubectl create deployment mcp-deploy --image=nginx
+#kubectl expose deployment mcp-deploy --name=myservice1 --port=80
+
+
