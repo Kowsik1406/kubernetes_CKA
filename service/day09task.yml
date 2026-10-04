@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+  labels:
+    env: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: myapp     #Deployment selector
+  template: 
+    metadata:
+      name: nginx-pod
+      labels:
+        env: demo
+        name: myapp      #pod labels
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.23.4-alpine
+        ports:
+        - containerPort: 80
+    
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+  labels:
+    env: demo
+spec:
+  type: NodePort
+  selector:               #Service selector
+   name: myapp
+  ports:
+   - protocol: TCP
+     port: 80
+     nodePort: 30001
+     targetPort: 80
+
+
+#Must match
+#Deployment selector -> name: myapp
+#Pod label -> name: myapp
+#Service selector -> name: myapp
+
+#Scale the deployment to 2 replicas ----> kubectl scale deployment myapp-deployment --replicas=2
+
+#Create a temporary Pod using the image busybox and run a wget command against the IP of the service.
+  #he reason for this task is to test the Service from inside the Kubernetes cluster.
+  #step1: kubectl run test-pod --image=busybox:1.28 -it --restart=Never -- sh
+    #kubectl run test-pod ---> creates a pod named test-pod using the busybox image.
+    #-it ---> interactive terminal
+    #-- restart=Never ---> pod will not be restarted after it is terminated
+    #-- sh ---> run the shell command inside the pod
+  #step:2 wget -O- http:<clusterIP> 
+  #step3: exit
+
+#Run a wget command against the service outside the cluster.
+  #---> wget http://<clusterIP> ( this will fail because clusterIp is accesible only inside the kubernetes cluster)
+
+#Change the service type so the Pods can be reached outside the cluster.
+  #run a wget command against the service outside the cluster.
+
+ # kubectl patch svc myapp -p '{"spec":{"type":"NodePort"}}'
+#
+  #kubectl get svc myapp
+#
+#kubectl get nodes -o wide
+#
+#wget -O- http://<NODE-IP>:<NODEPORT>
+
