@@ -1,0 +1,73 @@
+A static pod is a pod managed directly by kubelet Using a local manifest file on a node, without involving a deployment or other controller.
+
+Local manifest is simply a YAML file stored on node's local filesystem.
+For static pods kubelet watches a directory such as:
+/etc/kubernetes/manifests
+
+Difference: 
+Normal pod: Created through API server using kubectl apply -f pod.yaml
+Static pod: Created by kubelet from local manifest file on the node.
+
+Key points:
+
+A Static Pod is a Pod that is managed directly by the kubelet on a node, not by the Kubernetes API server.
+
+	® Defined using a manifest YAML file on the node ( usually /etc/kubernetes/manifests )
+	® Kubelet automatically creates and monitor it.
+	® If the pod crashes or is deleted, kubelet recreats it.
+	® Cannot be managed using controllers like Deployment or Replicasets.
+	® Commonly used for control plane components:
+		○ Kube-apiserver
+		○ Kube-controller-manager
+		○ Kube-schedular
+		○ Etcd
+
+	1. Check the pods
+
+	Kubectl get pods -A ---> to get all pods 
+	( Static Pods usually appear with the node name appended
+		Eg: 
+		
+		kube-apiserver-master
+		etcd-master
+		kube-scheduler-master
+		
+		 )
+
+	Kubectl get pods -n kube-system | grep schedular
+	
+		Kubectl get pods -n kube-system --> List all the pod in kube-system namespace
+		Grep schedular ---> Filters the output to show only the kube-schedular pod.
+		
+		Kube-schedular is a kubernetes control plane component. So it runs in the kube-system namespace typically a static pod.
+        
+            O/P --> kube-scheduler-cka-cluster2-control-plane pod is running
+        
+        kubectl get pods -n kubesystem -o wide | grep scheduler
+        
+            O/p --> The above pod is running on ( cka-cluster2-control-plane ) node.
+
+
+NOTE: 
+    The kube-scheduler is control plane component which is responsible for scheduling normal Pods onto worker or control-plane nodes.
+    It is NOT responsible for scheduling Static Pods.
+    Static Pods are created and managed directly by the kubelet.
+    The kube-scheduler itself runs as a Static Pod on the control-plane node and is also a control-plane component.
+    We can see the kube-scheduler Pod running in the kube-system namespace.
+-----------------------------------------------------------------------------------------------------------------------------------
+
+ 
+To access the node ( Docker container ) we need to inspect by --> Docker exec node-name
+   --> docker exec it cka-cluster2-control-plane bash
+   --> cd etc/kubernetes/manifest ( where all the yaml of the static pod will stored )
+        O/P 
+            root@cka-cluster2-control-plane:/etc/kubernetes/manifests# ls -lrt
+            total 16
+            -rw------- 1 root root 2620 Sep 30 10:37 etcd.yaml
+            -rw------- 1 root root 3968 Sep 30 10:37 kube-apiserver.yaml
+            -rw------- 1 root root 3272 Sep 30 10:37 kube-controller-manager.yaml
+            -rw------- 1 root root 1726 Sep 30 10:37 kube-scheduler.yaml
+            
+            NOTE: if we are moving the schedular yaml to somewhere then we cannot schedule a pod.
+            
+            ( All the control node component are static pod)

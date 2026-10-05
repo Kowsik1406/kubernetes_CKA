@@ -1,0 +1,48 @@
+
+###################################################
+
+NOTE: First refer to the static pod.txt before this 
+
+###################################################
+
+
+How do schedular find out to schedule a pod ( by manual scheduling )
+
+The schedular will check the pod state and notify which pod does not have selector field or nodename specified.
+
+IMPORTANT:
+
+    if there's no schedular file in control node ( container ) then we cannot able to schedule a pod in worker node because cheduler will check the best node to schedule a pod 
+    but there's a way of manual sheculing by giving the nodename manually
+
+    if we have two nodes we can give any of the nodename directly in pod.yml (spec) so that it can schedule a pod in that particular worker node even scheduler file doesn't exists in control plane node.
+    
+
+STEP1: check if the pod is running in scheduler node ----> (kubectl get pods -n kube-system | grep scheduler)
+STEP1: Remove the schedular file in the control plane node
+    1. kubectl get pods -n kube-system -o wide | grep scheduler ( to get the node name where pod is running )
+    2. docker exec -it cka-cluster2-control-plane bash ( enter into that node because it's also a container we need to give docker exec)
+    3. cd etc/kubernetes/manifests ( to check the control plane components list by giving --> ls -lrt)
+    4. move scheduler node to /tmp --> mv scheduler.yaml /tmp
+    5. now check ls -lrt ( it will be moved to temp)
+    6. now exit  and check -----> kubectl get pods -n kube-system | grep scheduler ( no output because there is no scheduler)
+
+STEP2: Now execute the manualschedulingpod.yml
+
+    1. $ kubectl get nodes ----> to get all the node name
+        NAME                         STATUS   ROLES           AGE   VERSION
+        cka-cluster2-control-plane   Ready    control-plane   17d   v1.37.0
+        cka-cluster2-worker          Ready    <none>          17d   v1.37.0
+        cka-cluster2-worker2         Ready    <none>          17d   v1.37.0
+    
+    2. In your manualschedulepod.yml you mentioned to schedule in (cka-cluster2-worker )
+    3. If you apply the pod will directly schedule in this node even sheduler is not present. 
+    4. now check in which node the pod has scheduled by ------> kubectl get pods -o wide 
+    
+STEP3: Now move the scheduler file from tmp to the control plane scheduler node. 
+
+    1. kubectl get nodes ----> to get control plane node name ( which is also a container )
+    2. now exec into that container 
+    3. cd etc/kubernetes/manifests and do ls -lrt
+    4. mv /tmp/kube-scheduler.yaml . ( mone the scheduler yaml from temp to this current directory)
+    5. kubectl get pods -n kube-system | grep schedule ( now check whether the scheduler pod is running in that control plane of scheduler)
