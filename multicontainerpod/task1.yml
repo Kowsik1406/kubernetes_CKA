@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mcp-1
+  labels:
+    env: test
+spec:
+  containers:
+  - name: nginx-pod
+    image: nginx
+
+  - name: busybox 
+    image: busybox
+    command: ['sh', '-c']
+    args: ["while true; do wget -qO- http://localhost; sleep 10; done"]
+
+
+##########################################################################
+
+#The BusyBox container acts as a sidecar container and continuously sends HTTP requests to the Nginx container using wget every 10 seconds.
+# Both containers communicate through localhost because they share the same Pod network namespace.
+
+#A sidecar container runs alongside the main container and provides supporting functionality such as logging, monitoring, proxying, or data synchronization. 
+#The BusyBox container is just a simple example of a sidecar.
+
+##########################################################################

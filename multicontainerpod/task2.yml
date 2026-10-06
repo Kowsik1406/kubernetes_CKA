@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-2
+  labels:
+    env: test
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      env: test
+
+  template:
+    metadata:
+      labels:
+        env: test
+
+    spec:
+      containers:
+      - name: busybox-container
+    
+        image: busybox
+        command: ['sh', '-c']
+        args: ['echo the app is running! && sleep 3600']
+
+      initContainers:
+      - name: init-myservice
+        image: busybox
+        command: ['sh', '-c', "until nslookup myservice.default.svc.cluster.local; do echo waiting for myservice; sleep 10; done;"]
+
+
+#kubectl apply -f task2.yml
+#kubectl get pods mcp-2
+
+#STEP1: 
+      #kubectl logs pod/mcp-2-<pod-id> -c busybox-container 
+      #it will wait for the init container to complete before starting the main container, and then it will print "the app is running!" to the logs.
+
+#STEP2: 
+      #kubectl logs pod/mcp-2-<pod-id> -c init-myservice 
+      #it will not print anything as there is no service named myservice in the default namespace.
+      #so it will keep waiting and printing "waiting for myservice" to the logs.
+
+#STEP3: 
+      #we need to create a service named myservice in the default namespace to complete the init container and start the main container.
+      #kubectl expose deployment mcp-2 --name myservice --port 80
+
+#STEP4: 
+      #kubectl logs pod/mcp-2-<pod-id> -c init-myservice 
+      #it will complete the init container and start the main container, and then it will print "the app is running!" to the logs.
+
+      #kubectl logs pod/mcp-2-<pod-id> -c busybox-container
+
+#STEP5: 
+      #kubectl delete service myservice
+      #it will delete the service named myservice in the default namespace.
