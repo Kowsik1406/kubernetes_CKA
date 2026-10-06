@@ -1,0 +1,28 @@
+# This is created imperatively 
+apiVersion: v1
+kind: Pod
+metadata: 
+  creationTimestamp: null
+  labels:
+    run: redis-pod
+  name: redis-pod
+spec:
+  containers:
+  - image: redis
+    name: redis-pod
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+  tolerations:            # The node will accept pods with this toleration even if the node has a taint with key "gpu" and value "true"
+  - key: "gpu"            
+    operator: "Equal"     
+    value: "true"
+    effect: NoSchedule
+status: {}
+
+##################################################################################################################################
+
+#NOTE: The pod will not decide the node to schedule on, but it will be accepted by nodes with this taint
+#If the pod need to decide the node to schedule on, it will need a nodeSelector or affinity rule to match the node with this taint
+
+##################################################################################################################################

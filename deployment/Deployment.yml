@@ -42,7 +42,7 @@ spec:
 #1.kubectl set image deployment deployment-name container-name=image:tag is used to update the image of the deployment. it will create a new revision of the deployment and rollout the new image to the pods.
 #2.annotate is to add metadata to deployment. we can add also in metadata section of deployment.yml file. but if we want to add it after deployment is created then we can use annotate command.
 #3. kubectl annotate deployment nginx kubernetes.io/change-cause="Pick up patch version"  this command is used to add metadata to the deployment after it is created. we can also add it in the metadata section of the deployment.yml file. but if we want to add it after deployment is created then we can use annotate command.
-#4.kubectl rollout histautoory deployment <deployment name> this command is used to check the history of the deployment. it will show the revision number and the change cause.
+#4.kubectl rollout history deployment <deployment name> this command is used to check the history of the deployment. it will show the revision number and the change cause.
 #5.so in revision 1 the image is nginx:1.23.0 and in revision 2 the image is nginx:1.23.4. so when we rollback to revision 1 the image will be reverted to nginx:1.23.0.
 #6. kubectl rollout undo deployment <deployment name> --to revision=<revision number> this command is used to rollback the deployment to a specific revision. it will revert the deployment to the state it was in at that revision.
 #7.kubectl get rs this command is used to get the replica sets of the deployment. it will show the replica sets created by the deployment and their status.

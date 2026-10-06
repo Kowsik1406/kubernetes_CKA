@@ -1,0 +1,23 @@
+###########################################################################################################################
+
+NOTE: Please be clear with taints and toleration before this.
+
+###########################################################################################################################
+
+
+Instead of node to make the decision what type of pod to accept, We will give the decision to the pod to which node it has to be deployed
+
+We can do with the help of labels. 
+
+STEP1: create a pod.yml and add the nodeselector in the staright to the container in spec
+    1. kubectl run nginx-new --image=nginx --dry-run=client -o yaml > nginxnew.yml
+    2. Now label any one of the node to match the nodeselector in given pod
+    
+STEP2: label the node --> kubectl label node <node-name> key=value
+    1. kubectl label node cka-cluster2-worker gpu=false ( because in nginxnew.yml we gave node selector as gpu=false )
+    2. To unlabel --> kubectl label node <node-name> gpu-
+    3. kubectl get nodes --show-labels ( to check the labels of nodes)
+    
+STEP3: check the pod status and Untaint the nodes to avoid confuse 
+    1. Check in which node the pod has scheduled --> kubectl get pods -o wide
+    2. it must scheduled in cka-cluster2-worker node.

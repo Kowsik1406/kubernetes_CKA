@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: nginx-new
+  name: nginx-new
+spec:
+  containers:
+  - image: nginx
+    name: nginx-new
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+  nodeSelector:            # The pod will be scheduled on the node with this label
+    gpu: "false"               # The node with this label will accept pods with this nodeSelector
+status: {}

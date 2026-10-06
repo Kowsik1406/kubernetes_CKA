@@ -1,0 +1,65 @@
+##################################
+TAINTS AND TOLERATIONS
+##################################
+
+STEP!: List the nodes --> kubectl get nodes
+STEp2: Add a taint in any of one of the worker node --> kubectl taint node cka-cluster-worker gpu=true:NoSchedule
+    It will allow the pod which has the toleration gpu=true.
+
+STEP3: Check if the node is tainted --> kubectl describe node <node_name> | grep Taints
+STEP4: create a pod and check in which node it's scheduled 
+    --> kubectl run nginx-pod --image=nginx 
+    --> kubectl get pods nginx-pod -o wide ( It will scheduled in another node not in the tainted node )
+    
+STEP5: now taint all the worker nodes with the same given for first one. 
+    --> kubectl taint node <node_name> gpu=true:NoSchedule
+    
+STEP6: delete the old pod and create new
+    --> now check the status of the pod ( kubectl get pods <pod-name>)
+    --> It must be in pending state so describe the pod to know the reason  ( kubectl describe pod <pod-name> )
+    --> No errors will be there but if you see the "Node:" it will be "None" 
+    --> Also you can see " preemption: 0/3 nodes are available: 3 Preemption is not helpful for scheduling. " ( Which means
+         this pod cannot schedule in any of the nodes unless it has the toleration )
+         
+STEP7: Create a new pod with the "toleration" ( gpu=true )
+    1.kubectl run redis-pod --image=redis --dry-run=client -o yaml > redis.yml
+        --> this will create a yaml file and redirect into the redis.yml file name ( dry client is to create the yaml instead of running directly)
+        --> We cannot add toleration from CLI so create a file and add toleration
+        -->     tolerations:
+                - key: "key_name" (eg: gpu)
+                  operator: "Equal"
+                  value: "value" (eg: true)
+                  effect: NoSchedule ( staright to the container in spec)
+                  
+STEP8: Now apply this redis.yml file and check in which node it's running --> kubectl get pods -o wide
+
+STEP9: You can see two pods are there "nginx-pod" and "redis-pod" where nginx-od is still in pending state
+    1. Remove the taint from node2 ( cka-cluster2-worker2 ) and check if the nginx-pod is running
+    2. TO remove taint just add hipen at the end --> " kubectl taint node cka-cluster2-worker2 gpu=true:NoSchedule- "
+    3. Now try to check the status of the pod ngin-pod which will automatically scheduled in node2 which is untainted.
+
+
+STEP10: Change the taint effect as "NoExecute" to node2 (cka-cluster2-worker2 ) and see the dfiiference
+    1. Note: now two pods are running nginx-pod and redis-pod
+    2. nginx-pod has no toleration and currently node2 has no taints
+    3. So, the nginx-pod is running in node2 and not in node1 because it has taints. 
+    
+    STEP1. untaint the node2 --> kubectl taint node cka-cluster2-worker2 <key>=<value>:<effect>-
+           --> kubectl taint node cka-cluster2-worker2 gpu=true:NoExecute-
+    STEP2. Check the pod status --> kubectl get pods ( the nginx pod will be evicted or deleted )
+    STEP3: because when we apply "NoExecute" effect 
+            --> new pods without toleration can't come here
+            --. also existing pods without toleration will be deleted or evicted.
+            
+
+##################################################################################################################################
+
+NOTE:
+    Taints and toleration just prevent or restrict unwanted pods to be scheduled on the particular node
+    Taint + Toleration does NOT guarantee that the Pod will be scheduled on that particular node.
+    A Pod with a matching toleration can be scheduled on the tainted node, but the scheduler may also schedule it on another suitable node.
+    If a Pod has a toleration, it means "I am allowed to run on this tainted node", not "I must run on this node." 
+    as you can see in this page STEP4. ( if one node has taints and other doen't the pod may scheduled in the other node which has no taints)
+
+    To make a Pod run on a specific node, use additional scheduling rules such as nodeSelector or node affinity.
+##################################################################################################################################
