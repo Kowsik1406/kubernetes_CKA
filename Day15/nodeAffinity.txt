@@ -1,0 +1,85 @@
+	Node Affinity:
+	
+		Node Affinity is an advanced version of NodeSelector that provides more flexible scheduling rules based on node labels.
+		
+		It supports operation such as: In, NotIn, Exists, DoesNotExist, Gt, Lt.
+		
+		And allows both mandatory and preferred scheduling rules.
+		
+		Types of Node Affinity:
+			1. requiredDuringSchedulingIgnoredDuringExecution. ----> ( Must run on matching node )
+		
+			    This is a hard rule. The node must satisfy the affinity condition; otherwise, the pod remains in the pending state.
+			
+			2. prefferedDuringSchedulingIgnoredDuringExecution ----> ( Prefer matching node, but not mandatory )
+		
+			    This is a soft rule. The scheduler tries to place the pod in matching node, but if no matching node is available, the pod can run on another node.
+	
+
+
+
+########################################################################################################################################
+
+nodeaffinity1.yml
+
+STEP1: List the nodes 
+
+    1. kubectl get nodes 
+    2. Get any one node and add a label to it --> kubectl label nodes <node-name> disktype=ssd
+    3. verify using --> kubectl get nodes --show-labels
+
+STEP2: Create a pod file
+
+    1. kubectl run node-affinity-pod --image=nginx --dry-run=client -o yaml > nodeaffinity1.yml 
+        --> Update the necessary fields using kubernetes cheatcode for node affinity
+        --> In  this nodeaffinity1.yml we used requiredDuringSchedulingIgnoredDuringExecution
+
+    2. kubectl apply -f nodeaffinity1.yml
+    3. check if the pod is scheduled in the exact node which you have given.
+    4. Due to "requiredscheduling..." it must scheduled in the exact node
+
+
+########################################################################################################################################
+
+
+########################################################################################################################################
+
+nodeaffinity2.yml 
+
+STEP1: List the nodes 
+
+    1. kubectl get nodes 
+    2. Get any one node and add a label to it --> kubectl label nodes <node-name> disktype=hdd
+    3. verify using --> kubectl get nodes --show-labels
+    
+STEP2: create a pod file
+
+    1. kubectl run node-affinity-pod --image=nginx --dry-run=client -o yaml > nodeaffinity2.yml 
+        --> Update the necessary fields using kubernetes cheatcode for node affinity
+        --> In  this nodeaffinity2.yml we used prefferedDuringSchedulingIgnoredDuringExecution
+
+    2. kubectl apply -f nodeaffinity2.yml
+    3. Check in which node the pod has scheduled.
+    4. as per our output it' scheduled in cka-cluster2-worker 
+
+        NOTE: 
+            This node has the label disktype=ssd. 
+            Since we used preferredDuringSchedulingIgnoredDuringExecution, the scheduler first tries to find a node with the label disktype=hdd.
+            However, no node has that label. 
+            Because it is a preferred (soft) rule, Kubernetes does not block the Pod and schedules it on any available node instead.
+            
+#######################################################################################################################################
+
+NOTE:
+ 
+    1. Eventhough you unlabel the node the existing pod will keep on running in both types of nodeaffinity
+            It will impact the new pods after the unlabel command. 
+             
+    2. We can levae the value as null by the type "Exists" as operator for any keys.
+    
+        - matchExpressions:
+          - key: disktype
+            operator: Exists 
+            
+        Here in this key= disktype, we added the operato = Exists, but value can be null or we can give any value
+        Here due to the value is null it can schedule any type of pod with label disktype (AAD, HDD, or anything)

@@ -1,0 +1,34 @@
+1. To ensure that a Pod is scheduled on the correct node, we can use Node Affinity together with Taints and Tolerations.
+
+2. First, we label the node and configure Node Affinity in the Pod. This tells the scheduler, "The Pod should run on nodes with this label."
+
+3. Next, we taint the same node and add a matching toleration to the Pod. This tells Kubernetes, "The Pod is allowed to run on this tainted node."
+
+    During scheduling, Kubernetes checks both conditions:
+
+        Node Affinity: Does the node have the required label?
+        Toleration: Can the Pod tolerate the node's taint?
+
+4. Only when both conditions are satisfied will the Pod be scheduled onto that node.
+
+5. If the node label does not match the affinity rule, the Pod will not be scheduled there.
+
+6. If the Pod does not have the required toleration, the taint will block the Pod from being scheduled on that node.
+
+Therefore:
+
+Node Affinity = Attraction (Pod wants to go to the node)
+Taints & Tolerations = Permission (Pod is allowed to go to the node)
+
+For successful scheduling:
+
+Label Match + Toleration Match = Pod Scheduled
+
+Label Match + No Toleration = Not Scheduled
+
+No Label Match + Toleration Match = Not Scheduled
+
+Easy Interview One-Liner:
+
+Node Affinity is used to attract Pods to specific nodes, while Taints and Tolerations are used to repel unwanted Pods.
+ When both are used together, Kubernetes ensures that only the intended Pods are scheduled on the intended nodes. 
