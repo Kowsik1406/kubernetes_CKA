@@ -1,0 +1,31 @@
+NOTE: bustling city: ( busy, lively, and full activity with lots of people, traffice business and shops)
+
+Think of kubernetesis a bustling city and pods as tenant in a apartment building. Each tenant (pod) requires a specific resources
+like CPU and memory to function. 
+
+Request = Reservation → "What I need."
+Limit = Boundary → "What I cannot exceed."
+
+##################################################################################################################################
+
+Requests: A Request specifies the minimum amount of resources a container needs to run properly.
+
+    1. Kubernetes Scheduler uses the request values when deciding where to place the pod.
+    2. The node must have at least the requested resources available.
+    3. Think of requests as a guaranteed reservation.
+
+Limits: A Limit specifies the maximum amount of resources a container is allowed to consume.
+
+    1. Prevents a pod from using excessive resources and affecting other pods.
+    2. Acts as a safety boundary.
+
+##################################################################################################################################
+
+Importance of requests and limits:
+
+Resource control:
+    1. By setting limits we can prevent a single pod from monopolizing resources, which can lead to issues like OOM ( out of memory)
+    2. OOM can be good thing because it kills the pod otherwise, the container would have consumed all the memory and could kill the node. 
+    3. killing the pod is a better option than killing a node itself.
+
+Predictability: Requests helps the scheduler to allocate the resources efficiently and ensure pods have the necessary resources to run efficiently.
