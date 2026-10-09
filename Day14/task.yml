@@ -1,0 +1,19 @@
+#Taint both your worker nodes below
+
+  #worker01--> gpu=true:NoSchedule , worker02--> gpu=false:NoSchedule
+
+# STEP1: schedule the pod. ( kubectl run nginx-pod --image=nginx --port=80 --labels="app=fortend" --dry-run=client -o yaml > pod1.yml)
+
+# STEP2: check the status of the pod, you will see the pod is in pending state because both the worker nodes are tainted and the pod is not tolerating the taint, so the kubelet is not able to schedule the pod on any of the worker node.
+
+  #  Warning  FailedScheduling  25s   default-scheduler  0/3 nodes are available: 3 node(s) had untolerated taint(s). preemption: 0/3 nodes are available: 3 Preemption is not helpful for scheduling.
+
+#STEP3: Now add the toleration to the pod, so that the pod will be accepted by the worker node with the taint gpu=true:NoSchedule.
+
+  # kubectl apply -f pod1.yml
+  #kubectl describe node <worker-node-name> | grep Taints ( check for taints )
+  # NOTE: worker01--> gpu=true:NoSchedule , worker02--> gpu=false:NoSchedule
+
+#STEP4: Now check the status of the pod, you will see the pod is in running state because the pod is tolerating the taint gpu=true:NoSchedule on worker01 node, so the kubelet is able to schedule the pod on worker01 node.
+
+  # kubectl get pods -o wide ( o/p will be like : nginx-pod   1/1     Running   0          2m    <worker01-node-ip>   <worker01-node-name
