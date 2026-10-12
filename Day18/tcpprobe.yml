@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tcppod-liveness
+  labels:
+    test: liveness
+spec:
+  containers:
+  - name: goproxy-container
+    image: registry.k8s.io/goproxy:0.1
+    ports:
+    - containerPort: 8080
+    livenessProbe:
+      tcpSocket:
+        port: 3000
+      initialDelaySeconds: 5
+      periodSeconds: 5
+
+
+#Note:
+
+    # 1. goproxy is a small HTTP proxy/web server application written in Go, provided by the Kubernetes project and commonly used in Kubernetes documentation and probe examples.
+    # 2. Because it's lightweight and predictable:
+
+          #Starts quickly
+          #Listens on a known port (8080)
+          #Easy to test TCP, HTTP, and liveness probes
+          #Small image size
+  
+###########################################################################################################################################
+
+
+# your application is running on port 3000, so the liveness probe will check the port 3000 of the container, 
+# if the port is open then the liveness probe will succeed and if the port is closed then the liveness probe will fail and the pod will be restarted by the kubelet.
+
+#commands to execute the above yaml file and check the liveness probe status of the pod.
+
+  #STEP1: kubectl apply -f tcpprobe.yml
+  #STEP2: kubectl get pods -o wide ( you will see the pod is in running state )
+  #STEP3: kubectl describe pod tcppod ( you will see the liveness probe is configured and the initialDelaySeconds is set to 5 seconds and periodDelaySeconds is set to 5 seconds )
+  #STEP4: kubectl get pods -w ( you will see the pod is restarted by the kubelet after 30 seconds because the liveness probe failed )

@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: examplepod-liveness
+  labels:
+    test: liveness
+spec:
+  containers:
+  - name: liveness-container
+    image: busybox:1.36
+    args:
+    - /bin/sh
+    - -c
+    - touch /tmp/healthy; sleep 30; rm -rf /tmp/healthy; sleep 600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/healthy
+      initialDelaySeconds: 5
+      periodSeconds: 5
+
+
+#how the Exec Liveness Probe uses cat /tmp/healthy to check file existence even though the file is empty.
+
+  #STEP1: busybox is a image that does not have OS it just have the basic commands, so we are using busybox image to create a pod and check the liveness probe.
+  #       the container will create a file /tmp/healthy and sleep for 30 seconds, then it will delete the file /tmp/healthy and sleep for 600 seconds, so that the liveness probe will fail after 30 seconds and the pod will be restarted by the kubelet.
+
+  #STEP2: liveness probe is configured to check the file /tmp/healthy using the command cat /tmp/healthy, if the file exists then the liveness probe will succeed and if the file does not exist then the liveness probe will fail and the pod will be restarted by the kubelet.
+  #       cat command is just checking the file existence, it does not matter if the file is empty or not, if the file exists then the liveness probe will succeed and if the file does not exist then the liveness probe will fail and the pod will be restarted by the kubelet.
+  #       just understand if the file exists only it can cat the file, if the file does not exist then it will fail to cat the file, so the liveness probe will fail and the pod will be restarted by the kubelet.
+
+  #STEP3: initialDelaySeconds is set to 5 seconds, so the liveness probe will start checking the file /tmp/healthy after 5 seconds of the container start.
+  #       periodDelaySeconds is set to 5 seconds, so the liveness probe will check the file /tmp/healthy every 5 seconds after creating the pod, so after 30 seconds the file /tmp/healthy will be deleted and the liveness probe will fail and the pod will be restarted by the kubelet.
+
+
+
+
+
+#################################################################################################################################
+
+#commands to execute the above yaml file and check the liveness probe status of the pod.
+
+  #STEP1: kubectl apply -f execprobe.yml
+  #STEP2: kubectl get pods -o wide ( you will see the pod is in running state )
+  #STEP3: kubectl describe pod examplepod ( you will see the liveness probe is configured and the initialDelaySeconds is set to 5 seconds and periodDelaySeconds is set to 5 seconds )
+  #STEP4: kubectl get pods -w ( you will see the pod is restarted by the kubelet after 30 seconds because the liveness probe failed )
+
+
+#You normally do not fix it. The purpose of the exercise is to show that:
+
+  #Pod starts healthy.
+  #File gets deleted.
+  #Liveness probe fails.
+  #Kubernetes restarts the container.
+
+  #So the pod becoming unhealthy is actually the expected behavior used to demonstrate how liveness probes work

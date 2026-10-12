@@ -1,0 +1,33 @@
+By default, Kubernetes does not store CPU and Memory usage metrics for pods and nodes.
+
+When we run --> kubectl autoscale deployment php-apache --cpu-percent=50 ... types of command
+
+Kubernetes needs a component that collects CPU and memory usage from each node.
+That component is Metrics Server.
+
+This is installed in Day16 folder
+
+########################################################################################################################################
+
+Metrics Server collects CPU and memory metrics from kubelets running on cluster nodes and exposes them through the metrics.k8s.io API. 
+It is required for commands like kubectl top node, kubectl top pod, and Horizontal Pod Autoscaler (HPA).
+Without Metrics Server, Kubernetes cannot obtain resource utilization metrics and HPA will not work.
+
+########################################################################################################################################
+
+
+HPA and VPA 
+
+
+HPA:
+
+In kubernetes, a HorizontalPodAutoscaler automatically updates a workload resource ( Such as deployment or statefulset ) with aim of automatically scaling capacity to match demand.
+
+Horizontal scaling is the process of increasing or decreasing the number of pod replicas based on workload demand. When application load increases, Kubernetes creates more pods; when load decreases, Kubernetes removes excess pods.
+
+VPA:
+
+Vertical scaling is the process of increasing or decreasing the CPU and memory resources assigned to existing pods. Instead of creating more pods, Kubernetes adjusts the resource requests and limits of the workload.
+
+
+

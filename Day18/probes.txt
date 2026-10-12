@@ -1,0 +1,30 @@
+Liveness probe and Readiness probe and startup probe
+
+Probe - A mechanism used by kubernetes to check the healthy and availability of container
+
+
+	1. Liveness probes
+
+	Check if the container is alive and if it fails it will restart the container.
+	
+	2. Readiness probe
+
+	Check if the container is ready to serve the requests.
+	If it fails kubernetes does not send the traffic to the pod through service
+	The container is not restarted.
+	
+	1. Startup probe
+
+	A startup probe checks whether an application inside a container has successfully started.
+	It is mainly used for slow-starting application that takes a long time to initialize.
+	
+There are three types of health probes as mentioned above, also we have three types of health checks.
+
+HTTP, TCP, command
+
+HTTP - An HTTP GET probe checks the health of an application by sending an HTTP request to a specified path and port inside the container. The probe succeeds when the application returns a successful HTTP status code.
+
+TCP socket probe - TCP Socket Probe checks whether an application is accepting connections on a specified port. If a TCP connection can be established, the probe succeeds.
+
+Exec probe - An Exec probe checks the health of an application by executing a command inside the container. The probe succeeds if the command exits with status code 0 and fails if it returns a non-zero exit code.
+	

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-apache
+spec:
+  selector:
+    matchLabels:
+      run: php-apache
+  template:
+    metadata:
+      labels:
+        run: php-apache
+    spec:
+      containers:
+      - name: php-apache
+        image: registry.k8s.io/hpa-example  # is a sample application created specifically for demonstrating Horizontal Pod Autoscaling (HPA).
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 200m
+
+#registry.k8s.io/hpa-example is a sample PHP-Apache application provided for HPA demonstrations. 
+#It generates measurable CPU load when requests are sent to it, allowing Metrics Server to collect CPU metrics and HPA to automatically scale the deployment. 
+#CPU requests are defined because HPA calculates utilization as a percentage of the requested CPU resources.
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-apache
+  labels:
+    run: php-apache
+spec:
+  ports:
+  - port: 80
+  selector:
+    run: php-apache

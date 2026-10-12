@@ -17,3 +17,29 @@
 #STEP4: Now check the status of the pod, you will see the pod is in running state because the pod is tolerating the taint gpu=true:NoSchedule on worker01 node, so the kubelet is able to schedule the pod on worker01 node.
 
   # kubectl get pods -o wide ( o/p will be like : nginx-pod   1/1     Running   0          2m    <worker01-node-ip>   <worker01-node-name
+
+###################################################################################################################################################
+
+#IMPORTANT NOTE: If you want to schedule the pod on control plane node, you need to delete the taint on the control plane node, so that the kubelet will be able to schedule the pod on the control plane node.
+
+#STEP5: Delete the taint on the control plane node
+
+  #kubectl describe node <control-plane-node-name> | grep Taints ( check for taints )
+  #it should be like : node-role.kubernetes.io/control-plane:NoSchedule
+  # kubectl taint nodes <control-plane-node-name> gpu=true:NoSchedule-
+  #Create a new pod with the image redis , it should be scheduled on control plane node
+  # NOTE: Now the control plane node is not tainted, so the kubelet will be able to schedule the pod on the control plane node.
+
+
+#STEP6: Now check the status of the pod, you will see the pod is in running state because the control plane node is not tainted, so the kubelet is able to schedule the pod on the control plane node.
+
+  # kubectl get pods -o wide ( o/p will be like : redis-pod2   1/1     Running   0          2m    <control-plane-node-ip>   <control-plane-node-name
+
+#STEP7: Add the taint back on the control plane node(the one that was removed)
+
+  # kubectl taint nodes <control-plane-node-name> gpu=true:NoSchedule
+
+#STEP8: delete all the taints on worker node to back to the original state, so that the kubelet will be able to schedule the pod on the worker node.
+
+  # kubectl taint nodes <worker-node-name> gpu=true:NoSchedule-
+  # kubectl taint nodes <worker-node-name> gpu=false:NoSchedule-

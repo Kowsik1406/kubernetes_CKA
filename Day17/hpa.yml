@@ -1,0 +1,31 @@
+apiVersion: autoscaling/v2               # Newer API version that supports multiple metrics (CPU, memory, custom metrics, etc.).
+kind: HorizontalPodAutoscaler
+metadata:
+  name: php-apache
+spec:
+  scaleTargetRef:                         # Specifies the target resource to scale (in this case, the Deployment named "php-apache").
+    apiVersion: apps/v1
+    kind: Deployment
+    name: php-apache
+  minReplicas: 1                          #Sets the minimum number of replicas for the Deployment. The HPA will not scale down below this number.
+  maxReplicas: 10                         #Sets the maximum number of replicas for the Deployment. The HPA will not scale up beyond this number.
+  metrics:                                #Defines the metrics that the HPA will use to determine when to scale the Deployment. In this case, it uses CPU utilization as the metric.
+  - type: Resource                        #Specifies that the metric type is a resource metric (CPU in this case).
+    resource: 
+      name: cpu
+      target:                             #Defines the target value for the specified metric. In this case, it sets the target CPU utilization to 50%. When the average CPU utilization across all pods in the Deployment exceeds this value, the HPA will scale up the number of replicas. Conversely, if the average CPU utilization falls below this value, the HPA will scale down the number of replicas.
+        type: Utilization
+        averageUtilization: 50
+
+#kubecl apply apply -f deploy.yml
+#kubectl get hpa -w
+
+#go to kubernetes documentation and get the increase the load command and run it in another terminal, so that the HPA will scale the deployment based on the CPU utilization.
+
+#split the terminal into two and run the below command in another terminal, so that the HPA will scale the deployment based on the CPU utilization.
+#STEP1: kubectl run -i --tty load-generator --rm --image=busybox:1.28 --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://php-apache; done"
+#STEP2: kubectl get hpa -w ( you will see the HPA will scale the deployment based on the CPU utilization, you will see the number of replicas will increase and decrease based on the CPU utilization)
+#now stop the load generator by pressing ctrl+c, so that the HPA will scale down the deployment based on the CPU utilization.
+
+
+#kubectl autoscale deployment php-apache --cpu-percent=50 --min=1 --max=10 --> imperative command to create HPA, but it is not recommended in production environment, so use the above yaml file to create HPA.

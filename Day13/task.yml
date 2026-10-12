@@ -12,3 +12,33 @@ spec:
     - containerPort: 80
 
   nodeName: cka-cluster2-worker2  #it will schedule the pod on worker2 node, this is called manual scheduling, if you want to schedule the pod you need to use nodeSelector or affinity, but this is not recommended in production environment.
+
+
+#1. create the pod manually ( use above yaml file)
+  # kubectl get pods -o wide
+
+#2. Login to the control plane node and go to the directory of default static pod manifests and try to restart the control plane components
+  # restart is nothing but delete the static pod manifest file and create it again, so that kubelet will restart the control plane component.
+  # here instead of deleting we are moving the static pod manifest file to another directory, so that kubelet will restart the control plane component.
+
+  #STEP1: docker exec -it <control-plane-container-name> bash
+  #STEP2: mkdir /tmp/backup
+  #STEP3: cd /etc/kubernetes/manifests
+  #STEP4: mv kube-apiserver.yaml /tmp/backup/
+  #STEP5: exit
+
+  #now check kubectl get nodes -n kube-system, you will see the control plane component is down, so the kubelet is not able to schedule the pod on the worker node.
+
+#3. Now check the status of the pod, you will see the pod is in pending state because the control plane component is down, so the kubelet is not able to schedule the pod on the worker node.
+
+  # kubectl get pods -o wide ( o/p will be like : unable to connect to the server: EOF because apiserver is down)
+  # apiserver yaml file is moved to backup directory, so kubelet will restart the control plane component, so the pod will be in pending state because kubelet is not able to schedule the pod on the worker node.
+
+#4. Move the manifests from backup directory to the original directory, so that kubelet will restart the control plane component.
+
+  #STEP1: docker exec -it <control-plane-container-name> bash
+  #STEP2: mv /tmp/backup/*.yaml /etc/kubernetes/manifests/
+  #STEP3: now check kubectl get nodes -n kube-system, you will see the control plane component is up and running, so the kubelet is able to schedule the pod on the worker node.
+  #STEP4: exit
+
+#5. Now check the status of the pod, you will see the pod is in running state because the control plane component is up and running, so the kubelet is able to schedule the pod on the worker node.
