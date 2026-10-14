@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-configmap 
+data:
+  FIRST_NAME: "Kowsik_Vigram"
+  APP_NAME: "MyApplication"
+  APP_ENV: "Testing"
+  DB_HOST: "MySql"
+  DB_PORT: "3306"
+
+

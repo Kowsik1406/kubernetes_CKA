@@ -1,0 +1,40 @@
+# In this pod file we are using the configmap as environment variable.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    app: my-app
+spec:
+  containers:
+  - name: nginx-containers
+    image: nginx 
+    envFrom:
+     - configMapRef:
+         name: app-configmap 
+
+#kubectl apply -f pod_type1.yml
+
+# Here kubernetes load all key-value pairs from nginx-configmap( configmap1.yml) into container as environment variables.
+
+# To check --> kubectl exec -it nginx-pod --env
+
+#kubectl describe pod nginx-pod ( look under Environment variables from:   )
+
+
+
+#######################################################################################################################################
+
+# NOTE
+
+  #1. Change any values in configmap1.yml and apply it after creating the pod.
+  #2. If the ConfigMap name remains the same, Kubernetes updates the existing ConfigMap.
+  #3. If you change the name from nginx-configmap to app-configmap and apply it, Kubernetes creates a new ConfigMap.
+  #4. Run `kubectl get cm` and you will see both ConfigMaps because they have different names.
+  #5. You can keep the old ConfigMap or delete it if it is no longer required. It is similar to having two separate files with different names.
+
+
+# NOTE ( for pod )
+
+  #1. Now you need to delete and apply the configmap to reflect 

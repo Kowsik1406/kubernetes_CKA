@@ -1,0 +1,52 @@
+#Here we are mounting the configmap as volume
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-pod
+  labels:
+    app: my-app
+spec:
+  containers:
+  - name: redis-containers
+    image: redis 
+    volumeMounts:
+    - name: config-volume
+      mountPath: /etc/config-volume
+
+  volumes:
+  - name: config-volume
+    configMap:
+      name: app-configmap
+      
+
+
+# kubectl exec -it redis-pod -- env ( does not show any values because here we are mounting the configmap as volumes)
+# kubectl exec -it redis-pod -- sh
+  # ls /etc/config-volume
+  #cat /etc/config-volume /<field-name>
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+#NOTE:
+    #1. Now go to configmap and change any values ( eg: APP_NAME from myapplication to myotherapplication)
+    #2. apply the configmap file
+    #3. No need to apply or delete the pod when if the configmap is mount as volume
+    #4. ConfigMap volume updates are not instantaneous. There can be a short delay before the new file contents appear in the Pod.
+    #5. Check after some time after applying the configmap.
+
+#------------------------------------------------------------------------------------------------------------------------------------
+
+# Example output:
+#      PS C:\Users\kowsi\OneDrive\Documents\GUVI\kubernetes\CKAPRACTICE\Day19> kubectl exec -it redis-pod -- sh
+#      # cat /etc/config-volume/FIRST_NAME
+#      Kowsik_Vigram# cat /etc/config-volume/APP_NAME
+#      MyotherApplication# exit
+#
+#      PS C:\Users\kowsi\OneDrive\Documents\GUVI\kubernetes\CKAPRACTICE\Day19> kubectl apply -f configmap1.yml  
+#      configmap/app-configmap configured
+#
+#      PS C:\Users\kowsi\OneDrive\Documents\GUVI\kubernetes\CKAPRACTICE\Day19> kubectl exec -it redis-pod -- sh
+#      # cat /etc/config-volume/APP_NAME
+#      MyApplication# 
