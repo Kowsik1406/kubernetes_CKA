@@ -30,7 +30,7 @@ spec:
 ###########################################################################################################################################
 
 
-# your application is running on port 3000, so the liveness probe will check the port 3000 of the container, 
+# your application is running on port 8080, so the liveness probe will check the port 3000 of the container, 
 # if the port is open then the liveness probe will succeed and if the port is closed then the liveness probe will fail and the pod will be restarted by the kubelet.
 
 #commands to execute the above yaml file and check the liveness probe status of the pod.

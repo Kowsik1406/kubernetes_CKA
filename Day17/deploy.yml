@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: php-apache
+  name: php-apache    #php-apache is used in HPA because it is a simple web application that can easily generate CPU load.
 spec:
   selector:
     matchLabels:

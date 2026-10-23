@@ -21,9 +21,11 @@ HPA and VPA
 
 HPA:
 
-In kubernetes, a HorizontalPodAutoscaler automatically updates a workload resource ( Such as deployment or statefulset ) with aim of automatically scaling capacity to match demand.
+In kubernetes, a HorizontalPodAutoscaler automatically updates a workload resource ( Such as deployment or statefulset ) with 
+aim of automatically scaling capacity to match demand.
 
-Horizontal scaling is the process of increasing or decreasing the number of pod replicas based on workload demand. When application load increases, Kubernetes creates more pods; when load decreases, Kubernetes removes excess pods.
+Horizontal scaling is the process of increasing or decreasing the number of pod replicas based on workload demand. 
+When application load increases, Kubernetes creates more pods; when load decreases, Kubernetes removes excess pods.
 
 VPA:
 

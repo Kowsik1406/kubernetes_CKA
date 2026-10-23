@@ -1,0 +1,15 @@
+create key 
+ceate certificate signing request
+create kubeadmin csr for user as kubernetes object 
+    --> The main reason we create a Kubernetes CSR object is to ask the Kubernetes cluster to approve and sign a user's certificate 
+    --> so that the user can authenticate to the Kubernetes API server.
+encode user.csr < base64 -w 0 user.csr >
+    --> copy the output and paste in kubernetes object for csr ( in request )
+    --> apply user-csr.yml file 
+
+kubectl get csr ( condition must be in pending )
+Approve the certificate --> kubectl certificate approve kowsik-csr 
+
+Now after approving, CA- Certificate Authority will issue the certificate 
+    retrive the certificate 
+    --> kubectl get csr kowsik-csr -o jsonpath='{.status.certificate}' | base64 -d > issued_kowsik.crt

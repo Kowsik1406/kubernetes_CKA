@@ -9,11 +9,11 @@ spec:
     name: php-apache
   minReplicas: 1                          #Sets the minimum number of replicas for the Deployment. The HPA will not scale down below this number.
   maxReplicas: 10                         #Sets the maximum number of replicas for the Deployment. The HPA will not scale up beyond this number.
-  metrics:                                #Defines the metrics that the HPA will use to determine when to scale the Deployment. In this case, it uses CPU utilization as the metric.
-  - type: Resource                        #Specifies that the metric type is a resource metric (CPU in this case).
-    resource: 
-      name: cpu
-      target:                             #Defines the target value for the specified metric. In this case, it sets the target CPU utilization to 50%. When the average CPU utilization across all pods in the Deployment exceeds this value, the HPA will scale up the number of replicas. Conversely, if the average CPU utilization falls below this value, the HPA will scale down the number of replicas.
+  metrics:                               # what to monitor ? ( metric)
+  - type: Resource                       #resource metric    (which metric --> resource)
+    resource:                            #resource details
+      name: cpu                          #what type of resource ( cpu or memory )
+      target:                            
         type: Utilization
         averageUtilization: 50
 
