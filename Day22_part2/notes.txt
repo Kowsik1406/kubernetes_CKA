@@ -1,0 +1,58 @@
+###################################  This folder day22_part2 is to set config for new user ###################################
+
+Before that we miust be ready with the following objects
+
+    STEP1: generate key
+        openssl genrsa -out vigram.key 2048
+
+    STEP2: create CSR and encode it
+
+        1.MSYS_NO_PATHCONV=1 openssl req -new \
+            -key vigram.key \
+            -out vigram.csr \
+            -subj "/CN=vigram/O=developer"   ---> MSYS_NO_PATHCONV=1 ( diabling path conversion because it will not work in git bash )
+
+        2. Verify csr 
+            openssl req -in vigram.csr -noout -text 
+
+
+    STEP3: create csr manifest ( not needed for cka )
+        1. create vigram_csr.yml and paste the required content ( make sure change the name)
+        2. encode vigram.csr ----> base64 -w 0 vigram.csr 
+        3. copy and paste the encoded csr in vigram-csr.yml ( "request" field)
+        4. apply vigram-csr.yml
+        5. kubectl get csr vigram-csr.yml ( status must be in pending )
+        6. approve it by --> kubernetes certificate approve vigram-csr 
+        7. till now kubeadmin approved the csr for user vigram and certificate will issue by CA 
+            ----> kubectl get csr vigram-csr -o jsonpath="{.status.certificate}" | base64 -d > vigram.crt
+
+    STEP4: Create role and rolebinding 
+        1. kubectl create role kowsik-role --verb=get,list,watch --resources=pod -n dev
+        2. kubectl create rolebinding read-pod2 --role=vigram-role --user=vigram -n dev 
+        3. kubectl auth can-i get pods --as vigram -n dev ( check you have access to read the pods )
+           kubectl auth can-i list pods --as vigram -n dev
+           kubectl auth can-i watch pods --as vigram -n dev
+
+    STEP6: configure kubeconfig
+        1. set-credentials = WHO AM I? ( If someone uses the user named vigram, use this certificate and private key to prove their identity.)
+        2.set-context = WHERE AM I WORKING?
+
+        1. kubectl config set-credentials vigram \
+            --client-certificate=vigram.crt
+            --client-key=vigram.key 
+
+        2. kubectl config set-context vigram-context \   --> a context links ( Cluster + User + Namespace ) together
+            --cluster=kind-cka-cluster2 \
+            --user=vigram \
+            --namespace=dev 
+
+    STEP7: Verify
+
+        1. kubectl config get-users ( we can see vigram user)
+        2. kubectl config get-contexts (we can see vigram-context)
+        3. kubectl config use-context vigram-context ( TO switch context to vigram-context )
+
+    STEP8: 
+        1. kubectl auth can-i get pods ---> yes
+        2. kubectl get deploy ( it is forbideen because we create role only for read access for pods)
+        3. to get back to old context --> kubectl use-context kind-cka-cluster2 
