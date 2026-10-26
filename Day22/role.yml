@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: dev
+  name: pod-reader
+rules:
+ - apiGroups: [""]
+   resources: ["pods"]
+   verbs: ["get","list","watch"] #providing read-only access 
+
+
+#Bind the role ( rolebinding )
+  # STEP1: $ kubectl create rolebinding read-pod \
+  #          > --role=pod-reader \
+  #          > --user=kowsik \                       ---> same for serviceaaccount instead os user replace   (  --serviceaccount=<namespace>:<sa-name> )
+  #          > -n dev
+
+  # STEP2: kubectl auth can-i get pod --as=kowsik -n dev
+
+
+# To count the no.of.roles: kubectl get roles -A --no-headers | wc -l

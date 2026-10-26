@@ -1,0 +1,44 @@
+Till now certificate creation we have done only authentication ---> defines who you are 
+but now we need to authorize the user ----> what you can do 
+
+just check do you hve access for current user 
+    ----> kubectl auth can-i get pod 
+    ----> kubectl auth whoami
+
+    ----> kubectl auth can-i get pod --as kowsik ---> the name which you created in Day20 and issued certificate for this name 
+          ( at first it will say no ) 
+    NOTE: So that you need to create role and rolebinding for this user (kowsik)
+
+
+===========================================================================================================================================
+
+STEP1: create a role.yml 
+STEP2: kubectl apply -f role.yml ( if namespace "dev" is not present crreate --> kubectl create namespace dev and then apply role.yml )
+STEP3: kubectl get role pod-reader -n dev 
+        kubectl describe role pod-reader -n dev 
+
+=====================================================================================================================================
+
+NOTE: We've created the role but we didn't specified for whih user for that we need to create another object "roleBinding" 
+
+RoleBinding --> use imperatice command for examination purpose 
+
+   # STEP1: $ kubectl create rolebinding read-pod \
+            > --role=pod-reader \
+            > --user=kowsik \                       ---> same for serviceaaccount instead os user replace   (  --serviceaccount=<namespace>:<sa-name> )
+            > -n dev
+
+=======================================================================================================================================
+
+Now let's see how we can login as adam and how we can run the command as adam.
+
+Till now we have seen user have access or not by creating role and role binding.
+
+STEP1: create key 
+STEP2: approve certificate 
+STEP3: create role and rolebinding
+STEP4: add entry in kubeconfig
+
+We are not actually running the command 
+
+NOTE: For that we need to enter in kubeconfig 
