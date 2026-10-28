@@ -10,7 +10,7 @@ Before that we miust be ready with the following objects
         1.MSYS_NO_PATHCONV=1 openssl req -new \
             -key vigram.key \
             -out vigram.csr \
-            -subj "/CN=vigram/O=developer"   ---> MSYS_NO_PATHCONV=1 ( diabling path conversion because it will not work in git bash )
+            -subj "/CN=vigram/O=developer"   ---> MSYS_NO_PATHCONV=1 ( disabling path conversion because it will not work in git bash )
 
         2. Verify csr 
             openssl req -in vigram.csr -noout -text 
@@ -19,12 +19,27 @@ Before that we miust be ready with the following objects
     STEP3: create csr manifest ( not needed for cka )
         1. create vigram_csr.yml and paste the required content ( make sure change the name)
         2. encode vigram.csr ----> base64 -w 0 vigram.csr 
+
+            base64 → Convert the file contents into Base64 encoded text.
+            -w 0 → Don't wrap the output into multiple lines (keep it as one long line).
+            vigram.csr → The input file being encoded.
+
         3. copy and paste the encoded csr in vigram-csr.yml ( "request" field)
         4. apply vigram-csr.yml
         5. kubectl get csr vigram-csr.yml ( status must be in pending )
         6. approve it by --> kubernetes certificate approve vigram-csr 
         7. till now kubeadmin approved the csr for user vigram and certificate will issue by CA 
             ----> kubectl get csr vigram-csr -o jsonpath="{.status.certificate}" | base64 -d > vigram.crt
+
+                    ----> to retrieve the signed certificate from Kubernetes after the CSR has been approved.
+                    ---->To safely store and transmit this data in JSON/YAML, Kubernetes encodes it as Base64.
+                    ----> without decoding the certificate is not valid
+
+            NOTE: Upload CSR  → Encode, Download CRT → Decode
+
+            ----> openssl x509 -in vigram.crt -text -noout ( verify user, vaildity, issuer, )
+            ----> openssl x509 -in vigram.crt -noout -dates ( show only dates )
+            ----> openssl x509 -in vigram.crt -noout -subject ( show only subject )
 
     STEP4: Create role and rolebinding 
         1. kubectl create role kowsik-role --verb=get,list,watch --resources=pod -n dev
@@ -56,6 +71,22 @@ Before that we miust be ready with the following objects
         1. kubectl auth can-i get pods ---> yes
         2. kubectl get deploy ( it is forbideen because we create role only for read access for pods)
         3. to get back to old context --> kubectl use-context kind-cka-cluster2 
+
+    STEP9: create clusterrole and clusterrolebinding
+
+        NOTE: To create clusterrole and clusterrolebinding we need to switch back to admin-context 
+        1. kubectl config use-context kind-cka-cluster2
+        2. kubectl create clusterrole --help or ( kubectl create clusterrole vigram-clusterrole --verb=get,list,watch --resource=node -n dev)
+        3. kubectl describe clusterrole vigram-clusterrole ( [] for all cluster resources )
+
+        4. Now create clusterrolebinding 
+            ----> kubectl create clusterrolebinding vigram-clusterrolebinding --clusterrole=vigram-clusterrole --user=vigram -n dev
+            ----> kubectl config use-context vigram-context
+            ----> kubectl get nodes ( verify )
+            ----> kubectl auth whoami
+            NOTE:
+                kubectl describe clusterrole vigram-clusterrole ( switch to admin and check bcz because vigram has no permission to read ClusterRoles. )
+                kubectl get clusterrole vigram-clusterrole
 
 
 
