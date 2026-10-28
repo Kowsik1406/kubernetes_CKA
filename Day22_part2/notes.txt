@@ -56,3 +56,12 @@ Before that we miust be ready with the following objects
         1. kubectl auth can-i get pods ---> yes
         2. kubectl get deploy ( it is forbideen because we create role only for read access for pods)
         3. to get back to old context --> kubectl use-context kind-cka-cluster2 
+
+
+
+To Delete all 
+
+    ----> kubectl config delete-user vigram
+    ----> kubectl config delete-context vigram-context
+    ----> kubectl delete rolebinding read-pod2 -n dev
+    ----> kubectl delete role vigram-role -n dev
