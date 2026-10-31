@@ -1,0 +1,38 @@
+# NOTE ----> this is not required for CKA it must be there in default
+
+
+# As we are using kind cluster if you enter ------> kubectl get pods -n kube-system 
+#  1. CNI comes with our kind cluster by default where We can see three pods running (eg:  kindnet-bzfbl)
+
+#NOTE: By default, KIND uses kindnet as its CNI.
+#      kindnet does not enforce NetworkPolicy rules.
+
+#So we need to install other CNI plugin 
+# In CKA labs calico or cilium will be instaled already no need to instal manualy 
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  extraPortMappings:
+  - containerPort: 30001
+    hostPort: 30002
+- role: worker
+- role: worker
+networking:
+  disableDefaultCNI: true
+  podSubnet: 192.168.0.0/16
+
+# Once it's created we can see dev cluster control plane nodes and woker nodes are not ready status
+# we need to install calico 
+#----> kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.33.0/manifests/calico.yaml
+
+#check by using ----> kubectl get pods -l k8s-app=calico-node -A --watch
+#once everything done give ----> kubectl get nodes ( now everything will be in ready state)
+
+#==================================================================================================================================
+
+#NOTE:
+
+#  1. Now you're in kind-dev context 
+#  2. TO switch back to kind-cka-cluster 2 ----> 

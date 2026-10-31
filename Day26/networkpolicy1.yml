@@ -1,0 +1,19 @@
+# Here the purpose of this file is, The NetworkPolicy is protecting the MySQL Pod and allowing only Backend Pods to access MySQL on port 3306.
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: db-test
+spec:
+  podSelector:                #----> Who am I protecting
+    matchLabels:
+      name: mysql
+  policyTypes:
+  - Ingress
+  ingress:                   #-----> Who can enter
+  - from:
+    - podSelector:
+        matchLabels:
+          role: backend
+    ports:
+    - port: 3306

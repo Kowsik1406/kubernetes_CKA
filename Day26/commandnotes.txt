@@ -1,0 +1,33 @@
+Once manifests and networkpolicy yaml created
+
+STEP1: Try to connect with bckend pod by 
+       --->kubectl exec -it frontend-pod -- bash
+       --->curl backend-service:80
+       --->( you can see nginx page)
+    
+STEP2: try to connect with mysql DB from frontend
+
+    NOTE: We can't curl to mysql because curl only handles HTTP/HTTPS request 
+          MySQL will wait for MySQL login protocol 
+    
+    So that we are installing telnet is the pods by executing into pod 
+    ----> apt-get update && apt-get install telnet -y
+    ----> telnet backend-service 80 ( it will get connected to backend )
+    ----> telnet db 3306 ( now it will stay not connect to service as we apply networkpolicy to reach db only through backend )
+
+STEP3: try to connect with mysql DB from backend 
+
+    ----> kubectl exec -it backend-pod -- bash
+    ----> curl frontend-service:80 ( curl will allow HTTP or network based service )
+
+    To check MySQL DB: ( entr into pod )
+    ----> apt-get update && apt-get install telnet -y
+    ----> telnet frontend-service 80 ( it will get connected to frontend )
+    ----> telnet db 3306 ( here it will connect to db as we mentioned in networkpolicy.yml)
+
+ STEP4: At last delete all 
+    --->kubectl delete -f manifest.yml or kubectl delete pods,svc --all
+
+ STEP5: get back to old context 
+    ----> kubectl config get-contexts 
+    ----> kubectl config use-context kind-cka-cluster2 

@@ -1,0 +1,54 @@
+Till Day22_part2 we have covered untill day24 from piyush youtube and Day25th is serviceaccount creation need to practice.
+
+=============================================================================================================================
+
+                                        NETWORK POLICY
+
+=============================================================================================================================                                 
+
+A network policies is a kubernetes object that controls which pod can communicate with which pods.
+
+Without network policies as we know earlier every pod can communicate each other.
+	
+	Pod A  <-------->  Pod B
+	Pod A  <-------->  Pod C
+	Pod B  <-------->  Pod C
+	
+With network policies
+
+	Pod A  -------> Pod B   ✅ Allowed
+	Pod A  -------> Pod C   ❌ Blocked
+
+If I have frontend, backend and MySQL
+	
+	Frontend --> Backend      ✅
+	Backend --> MySQL         ✅
+	
+	Frontend --> MySQL        ❌
+	Other Pods --> MySQL      ❌
+
+Ingress and Egress
+
+
+Imagine your application as:
+User ----> Frontend pod ----> Backend pod ----> MySQL pod
+
+Ingress = Traffic coming INTO the pod
+Egress = Traffic going OUT of the pod
+
+Traffic directions :
+
+	User ---Ingress---> Frontend   Frontend ---Egress---> Backend  Backend ---Egress---> MySQL  MySQL ---Ingress---> recieves request
+	
+So here from Frontend to backend:
+	Frontend pov ---> traffic is leaving from frontend so it's Egress
+	Backend pov ---> traffic is entering from frontend so it's Ingress
+
+
+Ingress ----> Controls incoming traffic 
+
+	other pod ---> target pod
+
+Egress ----> Controls outgoing traffic
+
+	Target pod ----> other pod
